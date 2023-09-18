@@ -12,46 +12,18 @@ The Presentation Layer is in charge of all user interaction and user interface c
 
 Application Layer: Also known as use cases or application services, the application layer houses business logic that is particular to a certain application. It serves as a bridge between the Presentation and Domain Layers. This layer is in charge of coordinating operations and ensuring that business logic is appropriately applied.
 
-Project links
-We have set up a network of two BankSystem instances and one DemoShop, connected through a CentralApi. This network supports all BankSystem functionality, including Global transfers, Direct payments and Card payments.
+Domain Layer:
+The Domain Layer is where the essential business logic and domain entities reside. It is the application's heart and should be independent of any specific technology or framework. This layer specifies your application's rules, validation, and behavior.
 
-Project	Address
-DemoShop	https://banksystem-demoshop.herokuapp.com/
-Test Bank 1
+Entities: Domain entities are defined as data table types that reflect the essential business ideas.
 
-Transfer details:
-* Bank name - Bank system
-* Bank country - Germany
-* Bank code - ABC	https://banksystem-1.herokuapp.com/
-Test Bank 2
+Infrastructure Layer:
+The Infrastructure Layer is responsible for anything connected to external concerns, such as databases, external services, and frameworks. It is the least abstract layer and should be changeable without impacting the application's core.
 
-Transfer details:
-* Bank name - Bank system 2
-* Bank country - Netherlands
-* Bank code - CBA	https://banksystem-2.herokuapp.com/
-All of these projects have a demo account already registered:
+Database: Use Entity Framework Core or similar ORM to implement data access.
 
-Email	Password
-test@test.com	Test123$
-Additionally, all bank accounts created have an initial balance of €500 for demonstration purposes.
-
-Bank accounts
-Bank accounts hold information about their owner, balance, transactions, date of creation, etc.
-
-Money transfers
-BankSystem supports two types of money transfers - internal and global / worldwide.
-
-Cards
-Cards are used for making purchases on other websites using the CentralApi.
-
-Direct payments
-Direct payments are a way to securely pay on websites directly through a bank account without the need to provide card details.
-
-DemoShop
-DemoShop is an example web application implementing direct and card payments.
-
-User settings
-Bank administration
+AccountController
+TransactionController
 Used technologies:
 
 C#
@@ -59,9 +31,6 @@ ASP.NET Core
 ASP.NET Core MVC
 ASP.NET Core Web API
 Entity Framework Core
-Asymmetric & hybrid encryption
-jQuery
-AJAX
-HTML
-CSS
-Bootstrap
+.net6
+FluentValidation.AspNetCore
+Quartz
