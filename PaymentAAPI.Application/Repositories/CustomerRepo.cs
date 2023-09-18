@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using PaymentAPI.Application.Dto;
+using PaymentAPI.Application.Helpers;
 using PaymentAPI.Application.Interface;
 using PaymentAPI.Application.Models;
 using PaymentAPI.Application.Models.Response;
@@ -64,6 +66,7 @@ namespace PaymentAPI.Application.Repositories
             tbl_Account.AccountName = request.Surname + " " + request.Name;
             tbl_Account.ProfileId = request.CustomerNumber;
             tbl_Account.Date = DateTime.Now;
+            tbl_Account.IsActive = true;
             await _tbl_Accountrepo.AddAsync(tbl_Account);
             var metadat = new
             {
@@ -73,6 +76,75 @@ namespace PaymentAPI.Application.Repositories
             response.Data = metadat;
             response.ResponseCode = "00";
             response.ResponseDescription = "SUCCESSFUL";
+            return response;
+        }
+
+        public async Task<ApiResponseBase<object>> GetAllCustomer(int pageIndex, int pageSize, bool previous, bool next)
+        {
+            var response = new ApiResponseBase<object>();
+            var res = await GetAllAsync();
+            var result = (from u in res
+                          select new CustomerDto
+                          {
+                              NationalIDNumber = u.NationalIDNumber,
+                              Name = u.Name,
+                              Surname = u.Surname,
+                              CustomerNumber = u.CustomerNumber,
+                              DateofBirth = u.DateofBirth.ToString("dd MMM yyyy"),
+                              Status = u.IsActive == true ? "ACTIVE" : "NOT ACTIVE",
+                              CreatedDate = u.CreatedDate,
+                              ModifyDate = u.ModifyDate,
+
+                          }).ToList();
+            if (result.Count() > 0)
+            {
+                if (previous)
+                {
+                    var metadata = new
+                    {
+                        Data = result.AsQueryable().OrderBy(c => c.CreatedDate)
+                    .ThenBy(c => c.Surname).LastPage(pageSize).ToList(),
+                        Count = result.AsQueryable().OrderBy(c => c.CreatedDate)
+                    .ThenBy(c => c.Surname).CountOfPages(pageSize),
+                    };
+                    response.Data = metadata;
+                    response.ResponseCode = "00";
+                    response.ResponseDescription = "SUCCESSFUL";
+                }
+                else if (next)
+                {
+                    var metadata = new
+                    {
+                        Data = result.AsQueryable().OrderBy(c => c.CreatedDate)
+                    .ThenBy(c => c.Surname).FirstPage(pageSize).ToList(),
+                        Count = result.AsQueryable().OrderBy(c => c.CreatedDate)
+                    .ThenBy(c => c.Surname).CountOfPages(pageSize),
+                    };
+                    response.Data = metadata;
+                    response.ResponseCode = "00";
+                    response.ResponseDescription = "SUCCESSFUL";
+                }
+                else
+                {
+                    var metadata = new
+                    {
+                        Data = result.AsQueryable().OrderBy(c => c.CreatedDate)
+                    .ThenBy(c => c.Surname).Page(pageIndex, pageSize).ToList(),
+                        Count = result.AsQueryable().OrderBy(c => c.CreatedDate)
+                  .ThenBy(c => c.Surname).CountOfPages(pageSize),
+                    };
+                    response.Data = metadata;
+                    response.ResponseCode = "00";
+                    response.ResponseDescription = "SUCCESSFUL";
+                }
+
+            }
+            else
+            {
+                response.ResponseCode = "99";
+                response.ResponseDescription = "No Records Found";
+            }
+
             return response;
         }
     }

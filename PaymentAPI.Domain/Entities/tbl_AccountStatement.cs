@@ -14,6 +14,7 @@ namespace PaymentAPI.Domain.Entities
         public string ProfileId { get; set; }
         public string AccountName { get; set; }
         public string AccountNumber { get; set; }
+        public bool IsActive { get; set; }
         public double ClosingBalance { get; set; }
         public double AvailableBalance { get; set; }
         public double TotalCredit { get; set; }

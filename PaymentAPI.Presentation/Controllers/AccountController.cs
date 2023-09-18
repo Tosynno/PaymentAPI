@@ -131,8 +131,8 @@ namespace PaymentAPI.Presentation.Controllers
         }
 
         [HttpPost("createCustomer")]
-        //[ServiceFilter(typeof(EncryptionActionFilter))]
-        public async Task<ActionResult<ApiResponseNoData>> CreateCustomer(CreateCustomerRequest data)
+        [ServiceFilter(typeof(EncryptionActionFilter))]
+        public async Task<ActionResult<ApiResponseNoData>> CreateCustomer(EncryptClass data)
         {
             var res = new ApiResponseNoData();
             var reslt = _httpContextAccessor.HttpContext?.Items?["data"]?.ToString();
@@ -149,7 +149,7 @@ namespace PaymentAPI.Presentation.Controllers
                 var response = new ApiResponseNoData() { ResponseCode = "30", ResponseDescription = "invalid request" };
                 return BadRequest(response);
             }
-            var result = await _customerRepo.CreateCustomer(data);
+            var result = await _customerRepo.CreateCustomer(deserializeReq);
             if (result.ResponseCode == "00")
             {
                 return Ok(result);
@@ -159,5 +159,29 @@ namespace PaymentAPI.Presentation.Controllers
                 return BadRequest(result);
             }
         }
+        [HttpGet("getAllCustomer")]
+        // [ValidateAuthRequestAttribute]
+        [ServiceFilter(typeof(EncryptionActionFilter))]
+        public async Task<ActionResult<ApiResponseNoData>> GetAllCustomer(string data)
+        {
+            var res = new ApiResponseNoData();
+            var reslt = _httpContextAccessor.HttpContext?.Items?["data"]?.ToString();
+            var splitRes = reslt?.Split('=');
+            if (splitRes != null && splitRes[0].Equals("Invalid client"))
+            {
+                res.ResponseCode = "03";
+                res.ResponseDescription = "Invalid client";
+                return BadRequest(res);
+            }
+            var deserializeReq = JsonConvert.DeserializeObject<GetAllMarchantRequest>(splitRes[^1]);
+            if (deserializeReq == null)
+            {
+                var response = new ApiResponseNoData() { ResponseCode = "30", ResponseDescription = "invalid request" };
+                return BadRequest(response);
+            }
+            var result = await _customerRepo.GetAllCustomer(deserializeReq.pageIndex, deserializeReq.pageSize, deserializeReq.previous, deserializeReq.next);
+            return Ok(result);
+        }
+
     }
 }

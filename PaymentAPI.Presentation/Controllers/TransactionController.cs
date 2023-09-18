@@ -83,5 +83,30 @@ namespace PaymentAPI.Presentation.Controllers
                 return BadRequest(result);
             }
         }
+        [HttpGet("verifyAccount")]
+        // [ValidateAuthRequestAttribute]
+        [ServiceFilter(typeof(EncryptionActionFilter))]
+        public async Task<ActionResult<ApiResponseNoData>> VerifyAccount(string data)
+        {
+            var res = new ApiResponseNoData();
+            var reslt = _httpContextAccessor.HttpContext?.Items?["data"]?.ToString();
+            var splitRes = reslt?.Split('=');
+            if (splitRes != null && splitRes[0].Equals("Invalid client"))
+            {
+                res.ResponseCode = "03";
+                res.ResponseDescription = "Invalid client";
+                return BadRequest(res);
+            }
+            var deserializeReq = splitRes[^1].Split(",");
+            if (deserializeReq.ToString() == null)
+            {
+                res.ResponseCode = "03";
+                res.ResponseDescription = "Invalid request";
+                return BadRequest(res);
+            }
+            var accountnumber = deserializeReq[0].Trim();
+            var result = await _transaction.VerifyAccount(accountnumber);
+            return Ok(result);
+        }
     }
 }

@@ -1,9 +1,16 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using PaymentAPI.Application.Utilities;
 using PaymentAPI.Infrastructure.Data;
 using PaymentAPI.Presentation.Extention;
 using PaymentAPI.Presentation.Middleware;
 using Serilog;
+using static System.Net.Mime.MediaTypeNames;
+using System;
+using Coravel;
+using Coravel.Scheduling.Schedule;
+using Coravel.Scheduling.Schedule.Interfaces;
 
 namespace PaymentAPI.Presentation
 {
@@ -37,14 +44,11 @@ namespace PaymentAPI.Presentation
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddApplicationServices(builder.Configuration);
             builder.Services.AddJwtservices(builder.Configuration);
-            //builder.Services.AddSwaggerGen();
+           
+         
 
             var app = builder.Build();
-            using (var scope = app.Services.CreateScope())
-            {
-                var dataContext = scope.ServiceProvider.GetRequiredService<PaymentdbContext>();
-                dataContext.Database.Migrate();
-            }
+            
 
             // Configure the HTTP request pipeline.
             bool prod = !string.IsNullOrEmpty(endpoint.Swagger) && endpoint.Swagger.ToLower().StartsWith("n");
@@ -53,6 +57,12 @@ namespace PaymentAPI.Presentation
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            using (var scope = app.Services.CreateScope())
+            {
+                var dataContext = scope.ServiceProvider.GetRequiredService<PaymentdbContext>();
+                dataContext.Database.Migrate();
+            }
+            
             app.UseMiddleware<ExceptionMiddleware>();
             app.UseHttpsRedirection();
             app.UseCors(x =>
@@ -71,6 +81,22 @@ namespace PaymentAPI.Presentation
             app.MapControllers();
 
             app.Run();
+           
+
+        }
+       
+     
+    }
+
+
+
+
+    class MyService
+    {
+        public void Run()
+        {
+            Console.WriteLine("My service is running...");
         }
     }
 }
+

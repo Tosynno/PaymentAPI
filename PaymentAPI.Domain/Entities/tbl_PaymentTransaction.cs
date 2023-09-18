@@ -10,7 +10,7 @@ namespace PaymentAPI.Domain.Entities
     {
         public Guid Id { get; set; }
         //public Guid AccountStatementId { get; set; }
-        public Guid ProfileId { get; set; }
+        public string ProfileId { get; set; }
         public string Tran_id { get; set; }
         public string Part_tran_srl_num { get; set; }
         public string CreditAccountNumber { get; set; }
@@ -21,7 +21,7 @@ namespace PaymentAPI.Domain.Entities
         public double Balance { get; set; }
         public DateTime TransactionDate { get; set; }
         public DateTime ValueDate { get; set; }
-        public tbl_Marchant tblPaymentProfile { get; set; }
+       // public tbl_Marchant tblPaymentProfile { get; set; }
         //public tbl_AccountStatement tblAccountStatement { get; set; }
         public List<tbl_NIPTransaction> tbl_NIPTransaction { get; set; } = new List<tbl_NIPTransaction>();
     }

@@ -12,7 +12,7 @@ using PaymentAPI.Infrastructure.Data;
 namespace PaymentAPI.Infrastructure.Migrations
 {
     [DbContext(typeof(PaymentdbContext))]
-    [Migration("20230918002230_initial")]
+    [Migration("20230918011537_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -99,10 +99,6 @@ namespace PaymentAPI.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AccountNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");

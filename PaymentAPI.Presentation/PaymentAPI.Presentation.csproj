@@ -9,6 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="C:\Users\TOSYNNO\.nuget\packages\coravel.pro\5.2.2\contentFiles\any\net6.0\webpack\dist\fonts\element-icons.ttf" />
+    <Content Remove="C:\Users\TOSYNNO\.nuget\packages\coravel.pro\5.2.2\contentFiles\any\net6.0\webpack\dist\fonts\element-icons.woff" />
+    <Content Remove="C:\Users\TOSYNNO\.nuget\packages\coravel.pro\5.2.2\contentFiles\any\net6.0\webpack\dist\webpack-bundle.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Coravel" Version="5.0.2" />
+    <PackageReference Include="Coravel.Pro" Version="5.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.22" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11">
       <PrivateAssets>all</PrivateAssets>
@@ -22,6 +30,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.11" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
+    <PackageReference Include="Quartz" Version="3.7.0" />
+    <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.7.0" />
+    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.7.0" />
     <PackageReference Include="Serilog" Version="3.0.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />

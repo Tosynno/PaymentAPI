@@ -71,6 +71,7 @@ namespace PaymentAPI.Application.Repositories
             tbl_Account.AccountName = request.BusinessName;
             tbl_Account.ProfileId = request.BusinessId;
             tbl_Account.Date = DateTime.Now;
+            tbl_Account.IsActive = true;
             await _tbl_Accountrepo.AddAsync(tbl_Account);
             var metadat = new
             {

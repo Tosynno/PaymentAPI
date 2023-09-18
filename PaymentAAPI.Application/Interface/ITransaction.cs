@@ -12,6 +12,8 @@ namespace PaymentAPI.Application.Interface
 {
     public interface ITransaction : IRepository<PaymentdbContext, tbl_PaymentTransaction>
     {
+        Task<ApiResponseBase<object>> VerifyAccount(string AccountNumber); 
+        Task<ApiResponseBase<object>> BalanceSheetLoader(); 
         Task<ApiResponseBase<object>> IntraBankTransfer(IntraBankTransferRequest request); 
         Task<ApiResponseBase<object>> NIPTransfer(NIPTransactionRequest request); 
     }
