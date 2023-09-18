@@ -13,9 +13,9 @@ namespace PaymentAPI.Application.Validations
         public IntraBankTransferRequestValidator()
         {
 
-            RuleFor(x => x.DebitMerchantNumber)
+            RuleFor(x => x.DebitAccountNumber)
     .NotEmpty().WithMessage("Enter a valid value");
-            RuleFor(x => x.CreditMerchantNumber)
+            RuleFor(x => x.CreditAccountNumber)
   .NotEmpty().WithMessage("Enter a valid value");
 
 

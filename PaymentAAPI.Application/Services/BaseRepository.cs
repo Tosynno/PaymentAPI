@@ -102,10 +102,18 @@ namespace PaymentAPI.Application.Services
 
         public async Task<T> AddAsync(T entity)
         {
+            try
+            {
+                await DbContext.Set<T>().AddAsync(entity);
 
-            await DbContext.Set<T>().AddAsync(entity);
+                await DbContext.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
 
-            await DbContext.SaveChangesAsync();
+                throw;
+            }
+           
 
             return entity;
         }

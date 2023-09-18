@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using PaymentAPI.Application.Utilities;
+using PaymentAPI.Infrastructure.Data;
 using PaymentAPI.Presentation.Extention;
 using PaymentAPI.Presentation.Middleware;
 using Serilog;
@@ -38,6 +40,11 @@ namespace PaymentAPI.Presentation
             //builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
+            using (var scope = app.Services.CreateScope())
+            {
+                var dataContext = scope.ServiceProvider.GetRequiredService<PaymentdbContext>();
+                dataContext.Database.Migrate();
+            }
 
             // Configure the HTTP request pipeline.
             bool prod = !string.IsNullOrEmpty(endpoint.Swagger) && endpoint.Swagger.ToLower().StartsWith("n");

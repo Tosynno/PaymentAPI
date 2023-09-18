@@ -14,15 +14,17 @@ namespace PaymentAPI.Presentation.Controllers
     {
         protected IHttpContextAccessor _httpContextAccessor;
         protected IMarchantProfile _marchantProfile;
+        protected ICustomerRepo _customerRepo;
 
-        public AccountController(IHttpContextAccessor httpContextAccessor, IMarchantProfile marchantProfile)
+        public AccountController(IHttpContextAccessor httpContextAccessor, IMarchantProfile marchantProfile, ICustomerRepo customerRepo)
         {
             _httpContextAccessor = httpContextAccessor;
             _marchantProfile = marchantProfile;
+            _customerRepo = customerRepo;
         }
 
         [HttpPost("createMarchant")]
-        [ServiceFilter(typeof(EncryptionActionFilter))]
+       [ServiceFilter(typeof(EncryptionActionFilter))]
         public async Task<ActionResult<ApiResponseNoData>> CreateMarchant(EncryptClass data)
         {
             var res = new ApiResponseNoData();
@@ -126,6 +128,36 @@ namespace PaymentAPI.Presentation.Controllers
             }
             var result = await _marchantProfile.SetAverageTransaction(deserializeReq);
             return Ok(result);
+        }
+
+        [HttpPost("createCustomer")]
+        //[ServiceFilter(typeof(EncryptionActionFilter))]
+        public async Task<ActionResult<ApiResponseNoData>> CreateCustomer(CreateCustomerRequest data)
+        {
+            var res = new ApiResponseNoData();
+            var reslt = _httpContextAccessor.HttpContext?.Items?["data"]?.ToString();
+            var splitRes = reslt?.Split('=');
+            if (splitRes != null && splitRes[0].Equals("Invalid client"))
+            {
+                res.ResponseCode = "03";
+                res.ResponseDescription = "Invalid client";
+                return BadRequest(res);
+            }
+            var deserializeReq = JsonConvert.DeserializeObject<CreateCustomerRequest>(splitRes[^1]);
+            if (deserializeReq == null)
+            {
+                var response = new ApiResponseNoData() { ResponseCode = "30", ResponseDescription = "invalid request" };
+                return BadRequest(response);
+            }
+            var result = await _customerRepo.CreateCustomer(data);
+            if (result.ResponseCode == "00")
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
     }
 }

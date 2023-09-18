@@ -16,16 +16,18 @@ using System.Threading.Tasks;
 
 namespace PaymentAPI.Application.Repositories
 {
-    public class MarchantProfile : BaseRepository<PaymentdbContext, tbl_PaymentProfile>, IMarchantProfile
+    public class MarchantProfile : BaseRepository<PaymentdbContext, tbl_Marchant>, IMarchantProfile
     {
+        private readonly IRepository<PaymentdbContext, tbl_Account> _tbl_Accountrepo;
         private readonly IValidator<PaymentProfileRequest> _validatorprofileReq;
         private readonly IValidator<UpdatePaymentProfileRequest> _validatorUpdateprofileReq;
         private readonly IValidator<AverageTransactionRequest> _validatorAverageTransactionReq;
-        public MarchantProfile(PaymentdbContext dbContext, IValidator<PaymentProfileRequest> validatorprofileReq, IValidator<UpdatePaymentProfileRequest> validatorUpdateprofileReq, IValidator<AverageTransactionRequest> validatorAverageTransactionReq) : base(dbContext)
+        public MarchantProfile(PaymentdbContext dbContext, IValidator<PaymentProfileRequest> validatorprofileReq, IValidator<UpdatePaymentProfileRequest> validatorUpdateprofileReq, IValidator<AverageTransactionRequest> validatorAverageTransactionReq, IRepository<PaymentdbContext, tbl_Account> tbl_Accountrepo) : base(dbContext)
         {
             _validatorprofileReq = validatorprofileReq;
             _validatorUpdateprofileReq = validatorUpdateprofileReq;
             _validatorAverageTransactionReq = validatorAverageTransactionReq;
+            _tbl_Accountrepo = tbl_Accountrepo;
         }
 
         public async Task<ApiResponseBase<object>> CreateMarchant(PaymentProfileRequest request)
@@ -50,24 +52,30 @@ namespace PaymentAPI.Application.Repositories
                 return response;
             }
             string marc = Utils.GenerateMarchantNumber();
-            tbl_PaymentProfile sa = new tbl_PaymentProfile();
+            tbl_Marchant sa = new tbl_Marchant();
             sa.BusinessId = request.BusinessId;
-            sa.MerchantNumber = marc;
-            sa.Surname = request.Surname;
+            sa.BusinessName = request.BusinessName;
+          
+          
             sa.ContactSurname = request.ContactSurname;
             sa.ContactName = request.ContactName;
             sa.DateOfEstablishment = request.DateOfEstablishment;
-            sa.NationalIDNumber = request.NationalIDNumber;
-            sa.Name = request.Name;
-            sa.Surname = request.Surname;
+           
             sa.IsActive = true;
             sa.CreatedDate =DateTime.Now;
 
             await AddAsync(sa);
 
+            tbl_Account tbl_Account = new tbl_Account();
+            tbl_Account.AccountNumber = marc;
+            tbl_Account.AccountName = request.BusinessName;
+            tbl_Account.ProfileId = request.BusinessId;
+            tbl_Account.Date = DateTime.Now;
+            await _tbl_Accountrepo.AddAsync(tbl_Account);
             var metadat = new
             {
-                MerchantNumber = marc,
+                AccountName = request.BusinessName,
+                AccountNumber = marc,
             };
             response.Data = metadat;
             response.ResponseCode = "00";
@@ -89,7 +97,7 @@ namespace PaymentAPI.Application.Repositories
                 }
             }
             var res = await GetAllAsync();
-            var chk = res.FirstOrDefault(c => c.MerchantNumber == request.MarchantNumber);
+            var chk = res.FirstOrDefault(c => c.BusinessId == request.BusinessId);
             if (chk == null)
             {
                 response.ResponseCode = "99";
@@ -97,15 +105,13 @@ namespace PaymentAPI.Application.Repositories
                 return response;
             }
             chk.BusinessId = request.BusinessId;
-            chk.Surname = request.Surname;
+           
             chk.ContactSurname = request.ContactSurname;
             chk.ContactName = request.ContactName;
             chk.DateOfEstablishment = request.DateOfEstablishment;
-            chk.NationalIDNumber = request.NationalIDNumber;
-            chk.Name = request.Name;
-            chk.Surname = request.Surname;
+            
             chk.IsActive = true;
-            chk.CreatedDate = DateTime.Now;
+            chk.ModifyDate = DateTime.Now;
 
             await UpdateAsync(chk);
 
@@ -127,11 +133,7 @@ namespace PaymentAPI.Application.Repositories
                               ContactName = u.ContactName,
                               ContactSurname = u.ContactSurname,
                               DateOfEstablishment = u.DateOfEstablishment,
-                              MerchantNumber = u.MerchantNumber,
                               AverageTransaction = u.AverageTransaction,
-                              NationalIDNumber = u.NationalIDNumber,
-                              Name = u.Name,
-                              Surname = u.Surname,
                               Status = u.IsActive == true ? "ACTIVE" : "NOT ACTIVE",
                               CreatedDate = u.CreatedDate,
                               ModifyDate = u.ModifyDate,
@@ -144,9 +146,9 @@ namespace PaymentAPI.Application.Repositories
                     var metadata = new
                     {
                         Data = result.AsQueryable().OrderBy(c => c.CreatedDate)
-                    .ThenBy(c => c.Name).LastPage(pageSize).ToList(),
+                    .ThenBy(c => c.BusinessName).LastPage(pageSize).ToList(),
                         Count = result.AsQueryable().OrderBy(c => c.CreatedDate)
-                    .ThenBy(c => c.Name).CountOfPages(pageSize),
+                    .ThenBy(c => c.BusinessName).CountOfPages(pageSize),
                     };
                     response.Data = metadata;
                     response.ResponseCode = "00";
@@ -157,9 +159,9 @@ namespace PaymentAPI.Application.Repositories
                     var metadata = new
                     {
                         Data = result.AsQueryable().OrderBy(c => c.CreatedDate)
-                    .ThenBy(c => c.Name).FirstPage(pageSize).ToList(),
+                    .ThenBy(c => c.BusinessName).FirstPage(pageSize).ToList(),
                         Count = result.AsQueryable().OrderBy(c => c.CreatedDate)
-                    .ThenBy(c => c.Name).CountOfPages(pageSize),
+                    .ThenBy(c => c.BusinessName).CountOfPages(pageSize),
                     };
                     response.Data = metadata;
                     response.ResponseCode = "00";
@@ -170,9 +172,9 @@ namespace PaymentAPI.Application.Repositories
                     var metadata = new
                     {
                         Data = result.AsQueryable().OrderBy(c => c.CreatedDate)
-                    .ThenBy(c => c.Name).Page(pageIndex, pageSize).ToList(),
+                    .ThenBy(c => c.BusinessName).Page(pageIndex, pageSize).ToList(),
                         Count = result.AsQueryable().OrderBy(c => c.CreatedDate)
-                  .ThenBy(c => c.Name).CountOfPages(pageSize),
+                  .ThenBy(c => c.BusinessName).CountOfPages(pageSize),
                     };
                     response.Data = metadata;
                     response.ResponseCode = "00";
@@ -203,7 +205,7 @@ namespace PaymentAPI.Application.Repositories
                 }
             }
             var res = await GetAllAsync();
-            var result = res.FirstOrDefault(c => c.MerchantNumber == request.MarchantNumber);
+            var result = res.FirstOrDefault(c => c.BusinessId == request.BusinessId);
             if (result == null)
             {
                 response.ResponseCode = "99";

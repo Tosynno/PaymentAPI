@@ -16,7 +16,7 @@ namespace PaymentAPI.Application.Validations
    .NotEmpty().WithMessage("Enter a valid value");
             RuleFor(x => x.BankCode)
    .NotEmpty().WithMessage("Enter a valid value");
-            RuleFor(x => x.DebitMerchantNumber)
+            RuleFor(x => x.DebitAccountNumber)
     .NotEmpty().WithMessage("Enter a valid value");
             RuleFor(x => x.CreditMerchantNumber)
   .NotEmpty().WithMessage("Enter a valid value");

@@ -8,8 +8,8 @@ namespace PaymentAPI.Application.Models
 {
     public class IntraBankTransferRequest
     {
-        public string CreditMerchantNumber { get; set; }
-        public string DebitMerchantNumber { get; set; }
+        public string CreditAccountNumber { get; set; }
+        public string DebitAccountNumber { get; set; }
         public string? Narration { get; set; }
         public double TransactionAmount { get; set; }
     }

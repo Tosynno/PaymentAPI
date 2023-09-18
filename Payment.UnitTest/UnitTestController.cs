@@ -28,6 +28,7 @@ namespace Payment.UnitTest
         [Fact]
         public async void NIPTransaction()
         {
+
             //arrange
             var response = new ApiResponseBase<object>();
             var niptran = NIPTransactionRequest();
@@ -35,13 +36,17 @@ namespace Payment.UnitTest
             var encrypt = Utils.EncryptString("zMdRgUkXp2s5v8y/B?O(H+MbPeShZxCe", req);
             //_transaction.Setup(x => x.NIPTransfer(niptran))
             //    .Returns(niptran);
-          
+
             var transactionController = new TransactionController(_httpContextAccessor.Object, _transaction.Object);
             //act
             EncryptClass encryptClass = new EncryptClass();
             if (!string.IsNullOrEmpty(encrypt))
             {
                 // Access properties or methods of myObject safely here.
+                var context = new DefaultHttpContext();
+                
+                context.Request.Headers["data"] = encrypt;
+                _httpContextAccessor.Setup(req => req.HttpContext.Request.Headers["data"].ToString()).Returns(It.IsAny<string>());// = decryptRequest;
                 encryptClass.Data = encrypt;
                 var Result = await transactionController.NIPTransfer(encryptClass);
                 //assert
@@ -55,7 +60,7 @@ namespace Payment.UnitTest
             {
                 Assert.NotNull("");
             }
-           
+
         }
 
         private NIPTransactionRequest NIPTransactionRequest()
@@ -66,11 +71,11 @@ namespace Payment.UnitTest
                 BankName = "Access Bank",
                 BankCode = "0443",
                 CreditMerchantNumber = "0078658767",
-                DebitMerchantNumber = "0007854335",
+                DebitAccountNumber = "0007854335",
                 Narration = "Test",
                 TransactionAmount = 100.90,
             };
-             
+
             return NIPTransactionRequest;
         }
     }

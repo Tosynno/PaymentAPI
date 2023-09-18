@@ -1,11 +1,13 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PaymentAPI.Application.Interface;
 using PaymentAPI.Application.Models;
 using PaymentAPI.Application.Repositories;
 using PaymentAPI.Application.Services;
+using PaymentAPI.Application.Utilities;
 using PaymentAPI.Application.Validations;
 using PaymentAPI.Infrastructure.Data;
 using System.Text;
@@ -20,7 +22,13 @@ namespace PaymentAPI.Presentation.Extention
             services.AddScoped(typeof(IRepository<,>), typeof(BaseRepository<,>));
             services.AddScoped<IMarchantProfile, MarchantProfile>();
             services.AddScoped<ITransaction, TransactionRepo>();
-            services.AddScoped<PaymentdbContext>();
+            services.AddScoped<ICustomerRepo, CustomerRepo>();
+           services.AddScoped<PaymentdbContext>();
+           // services.AddDbContext<PaymentdbContext>();
+            //services.AddDbContextPool<PaymentdbContext>(options =>
+            //{
+            //    options.UseSqlServer(config.GetConnectionString("PaymentDb"));
+            //});
 
 
             services.AddScoped<IValidator<PaymentProfileRequest>, PaymentProfileRequestValidator>();
@@ -28,6 +36,10 @@ namespace PaymentAPI.Presentation.Extention
             services.AddScoped<IValidator<AverageTransactionRequest>, AverageTransactionRequestValidator>();
             services.AddScoped<IValidator<IntraBankTransferRequest>, IntraBankTransferRequestValidator>();
             services.AddScoped<IValidator<NIPTransactionRequest>, NIPTransactionRequestValidator>();
+            services.AddScoped<IValidator<CreateCustomerRequest>, CreateCustomerRequestValidator>();
+
+            services.AddScoped<EncryptionActionFilter>();
+            services.AddHttpContextAccessor();
             return services;
         }
         public static void AddJwtservices(this IServiceCollection services, IConfiguration configuration)

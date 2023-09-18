@@ -18,11 +18,11 @@ namespace PaymentAPI.Application.Repositories
     {
         private readonly IValidator<IntraBankTransferRequest> _validatorIntraBankTransferReq;
         private readonly IValidator<NIPTransactionRequest> _validatorNIPTransferReq;
-        private readonly IRepository<PaymentdbContext, tbl_AccountStatement> _tblAccountStatementRepository;
-        private readonly IRepository<PaymentdbContext, tbl_PaymentProfile> _tblPaymentProfileRepository;
+        private readonly IRepository<PaymentdbContext, tbl_Account> _tblAccountStatementRepository;
+        private readonly IRepository<PaymentdbContext, tbl_Marchant> _tblPaymentProfileRepository;
         private readonly IRepository<PaymentdbContext, tbl_NIPTransaction> _tblPaymentNIPRepository;
 
-        public TransactionRepo(PaymentdbContext dbContext, IValidator<IntraBankTransferRequest> validatorIntraBankTransferReq, IRepository<PaymentdbContext, tbl_AccountStatement> tbl_AccountStatementRepository, IRepository<PaymentdbContext, tbl_PaymentProfile> tblPaymentProfileRepository, IValidator<NIPTransactionRequest> validatorNIPTransferReq, IRepository<PaymentdbContext, tbl_NIPTransaction> tblPaymentNIPRepository) : base(dbContext)
+        public TransactionRepo(PaymentdbContext dbContext, IValidator<IntraBankTransferRequest> validatorIntraBankTransferReq, IRepository<PaymentdbContext, tbl_Account> tbl_AccountStatementRepository, IRepository<PaymentdbContext, tbl_Marchant> tblPaymentProfileRepository, IValidator<NIPTransactionRequest> validatorNIPTransferReq, IRepository<PaymentdbContext, tbl_NIPTransaction> tblPaymentNIPRepository) : base(dbContext)
         {
             _validatorIntraBankTransferReq = validatorIntraBankTransferReq;
             _tblAccountStatementRepository = tbl_AccountStatementRepository;
@@ -48,23 +48,23 @@ namespace PaymentAPI.Application.Repositories
             }
             var res = await GetAllAsync();
 
-            var resultProfiledebit = Profileres.FirstOrDefault(c => c.MerchantNumber == request.DebitMerchantNumber);
+            var resultProfiledebit = Acctstatementres.FirstOrDefault(c => c.AccountNumber == request.DebitAccountNumber);
             if (resultProfiledebit == null)
             {
                 response.ResponseCode = "99";
-                response.ResponseDescription = $"{request.DebitMerchantNumber} Does not exist!!!";
+                response.ResponseDescription = $"{request.DebitAccountNumber} Does not exist!!!";
                 return response;
             }
-            var resultProfilecredit = Profileres.FirstOrDefault(c => c.MerchantNumber == request.CreditMerchantNumber);
+            var resultProfilecredit = Acctstatementres.FirstOrDefault(c => c.AccountNumber == request.CreditAccountNumber);
             if (resultProfilecredit == null)
             {
                 response.ResponseCode = "99";
-                response.ResponseDescription = $"{request.CreditMerchantNumber} Does not exist!!!";
+                response.ResponseDescription = $"{request.CreditAccountNumber} Does not exist!!!";
                 return response;
             }
 
             var result = res.FirstOrDefault(c => c.Narration == request.Narration &&
-          c.CreditMerchantNumber == request.CreditMerchantNumber && c.DebitMerchantNumber == request.DebitMerchantNumber);
+          c.CreditAccountNumber == request.CreditAccountNumber && c.DebitAccountNumber == request.DebitAccountNumber);
             if (result != null)
             {
                 response.ResponseCode = "99";
@@ -72,7 +72,7 @@ namespace PaymentAPI.Application.Repositories
                 return response;
             }
 
-            var chkDebitMerchantNumber = res.FirstOrDefault(c => c.DebitMerchantNumber == request.DebitMerchantNumber);
+            var chkDebitMerchantNumber = res.FirstOrDefault(c => c.DebitAccountNumber == request.DebitAccountNumber);
             if (chkDebitMerchantNumber != null)
             {
                 if (chkDebitMerchantNumber.Balance < request.TransactionAmount)
@@ -87,13 +87,13 @@ namespace PaymentAPI.Application.Repositories
             tbl_PaymentTransaction sadebit = new tbl_PaymentTransaction();
             sadebit.Tran_id = Utils.GenerateTranId();
             sadebit.Part_tran_srl_num = Utils.GeneratePart_tran_srl_num();
-            sadebit.PaymentProfileId = resultProfiledebit.Id;
-            sadebit.CreditMerchantNumber = request.CreditMerchantNumber;
+            sadebit.ProfileId = resultProfiledebit.Id;
+            sadebit.CreditAccountNumber = request.CreditAccountNumber;
             sadebit.TransactionType = 'D';
-            sadebit.DebitMerchantNumber = request.DebitMerchantNumber;
+            sadebit.DebitAccountNumber = request.DebitAccountNumber;
             sadebit.TransactionAmount = request.TransactionAmount;
             sadebit.Balance = request.TransactionAmount - result.Balance;
-            sadebit.Narration = request.Narration == null ? request.CreditMerchantNumber + "_" + DateTime.Now.ToString("yyyyddMMhhmmss") : request.Narration;
+            sadebit.Narration = request.Narration == null ? request.CreditAccountNumber + "_" + DateTime.Now.ToString("yyyyddMMhhmmss") : request.Narration;
             sadebit.TransactionDate = DateTime.Now;
             sadebit.ValueDate = DateTime.Now;
             await AddAsync(sadebit);
@@ -102,13 +102,13 @@ namespace PaymentAPI.Application.Repositories
             tbl_PaymentTransaction sacredit = new tbl_PaymentTransaction();
             sacredit.Tran_id = sadebit.Tran_id;
             sacredit.Part_tran_srl_num = sadebit.Part_tran_srl_num;
-            sacredit.PaymentProfileId = resultProfilecredit.Id;
-            sacredit.CreditMerchantNumber = request.CreditMerchantNumber;
+            sacredit.ProfileId = resultProfilecredit.Id;
+            sacredit.CreditAccountNumber = request.CreditAccountNumber;
             sacredit.TransactionType = 'C';
-            sacredit.DebitMerchantNumber = request.DebitMerchantNumber;
+            sacredit.DebitAccountNumber = request.DebitAccountNumber;
             sacredit.TransactionAmount = request.TransactionAmount;
             sacredit.Balance = request.TransactionAmount + result.Balance;
-            sacredit.Narration = request.Narration == null ? request.CreditMerchantNumber + "_" + DateTime.Now.ToString("yyyyddMMhhmmss") : request.Narration;
+            sacredit.Narration = request.Narration == null ? request.CreditAccountNumber + "_" + DateTime.Now.ToString("yyyyddMMhhmmss") : request.Narration;
             sacredit.TransactionDate = DateTime.Now;
             sacredit.ValueDate = DateTime.Now;
             await AddAsync(sacredit);
@@ -135,17 +135,17 @@ namespace PaymentAPI.Application.Repositories
             }
             var res = await GetAllAsync();
 
-            var resultProfil = Profileres.FirstOrDefault(c => c.MerchantNumber == request.DebitMerchantNumber);
+            var resultProfil = Acctstatementres.FirstOrDefault(c => c.AccountNumber == request.DebitAccountNumber);
             if (resultProfil == null)
             {
                 response.ResponseCode = "99";
-                response.ResponseDescription = $"{request.DebitMerchantNumber} Does not exist!!!";
+                response.ResponseDescription = $"{request.DebitAccountNumber} Does not exist!!!";
                 return response;
             }
            
 
             var result = res.FirstOrDefault(c => c.Narration == request.Narration &&
-          c.CreditMerchantNumber == request.CreditMerchantNumber && c.DebitMerchantNumber == request.DebitMerchantNumber);
+          c.CreditAccountNumber == request.CreditMerchantNumber && c.DebitAccountNumber == request.DebitAccountNumber);
             if (result != null)
             {
                 response.ResponseCode = "99";
@@ -157,13 +157,13 @@ namespace PaymentAPI.Application.Repositories
             tbl_PaymentTransaction sacredit = new tbl_PaymentTransaction();
             sacredit.Tran_id = Utils.GenerateTranId();
             sacredit.Part_tran_srl_num = Utils.GeneratePart_tran_srl_num();
-            sacredit.PaymentProfileId = resultProfil.Id;
-            sacredit.CreditMerchantNumber = request.CreditMerchantNumber;
+            sacredit.ProfileId = resultProfil.Id;
+            sacredit.CreditAccountNumber = request.CreditMerchantNumber;
             sacredit.TransactionType = 'D';
-            //sacredit.DebitMerchantNumber = request.DebitMerchantNumber;
+            //sacredit.DebitAccountNumber = request.DebitAccountNumber;
             sacredit.TransactionAmount = request.TransactionAmount;
             sacredit.Balance = request.TransactionAmount - result.Balance;
-            sacredit.Narration = request.Narration == null ? request.DebitMerchantNumber + "_" + request.BankName : request.Narration;
+            sacredit.Narration = request.Narration == null ? request.DebitAccountNumber + "_" + request.BankName : request.Narration;
             sacredit.TransactionDate = DateTime.Now;
             sacredit.ValueDate = DateTime.Now;
             await AddAsync(sacredit);
@@ -172,11 +172,11 @@ namespace PaymentAPI.Application.Repositories
             tbl_NIP.PaymentTransactionId = sacredit.Id;
             tbl_NIP.CreditMerchantNumber = request.CreditMerchantNumber;
             tbl_NIP.TransactionType = 'D';
-            tbl_NIP.DebitMerchantNumber = request.DebitMerchantNumber;
+            tbl_NIP.DebitMerchantNumber = request.DebitAccountNumber;
             tbl_NIP.TransactionAmount = request.TransactionAmount;
             tbl_NIP.BankName = request.BankName;
             tbl_NIP.BankCode = request.BankCode;
-            tbl_NIP.Narration = request.Narration == null ? request.DebitMerchantNumber + "_" + request.BankName : request.Narration;
+            tbl_NIP.Narration = request.Narration == null ? request.DebitAccountNumber + "_" + request.BankName : request.Narration;
             tbl_NIP.TransactionDate = DateTime.Now;
             tbl_NIP.ValueDate = DateTime.Now;
             await _tblPaymentNIPRepository.AddAsync(tbl_NIP);

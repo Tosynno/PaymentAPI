@@ -13,7 +13,7 @@ namespace PaymentAPI.Application.Validations
         public AverageTransactionRequestValidator()
         {
 
-            RuleFor(x => x.MarchantNumber)
+            RuleFor(x => x.BusinessId)
     .NotEmpty().WithMessage("Enter a valid value");
 
             RuleFor(x => x.TransactionAmountlimit).GreaterThan(0).WithMessage("Enter a valid value");

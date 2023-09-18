@@ -12,7 +12,7 @@ namespace PaymentAPI.Application.Validations
     {
         public UpdatePaymentProfileRequestValidator()
         {
-            RuleFor(x => x.BusinessId).LessThanOrEqualTo(0).WithMessage("Enter a valid value");
+            RuleFor(x => x.BusinessId).NotEmpty().WithMessage("Enter a valid value");
             RuleFor(x => x.BusinessName)
     .NotEmpty().WithMessage("Enter a valid value");
             RuleFor(x => x.Surname)

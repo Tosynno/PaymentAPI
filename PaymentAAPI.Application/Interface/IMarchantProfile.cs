@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace PaymentAPI.Application.Interface
 {
-    public interface IMarchantProfile : IRepository<PaymentdbContext, tbl_PaymentProfile>
+    public interface IMarchantProfile : IRepository<PaymentdbContext, tbl_Marchant>
     {
         Task<ApiResponseBase<object>> CreateMarchant(PaymentProfileRequest request);
         Task<ApiResponseBase<object>> EditMarchant(UpdatePaymentProfileRequest request);
