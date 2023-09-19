@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PaymentAPI.Presentation", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payment.UnitTest", "Payment.UnitTest\Payment.UnitTest.csproj", "{4AA1357B-40AE-49ED-8116-C6E724B863A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundJob", "BackgroundJob\BackgroundJob.csproj", "{C9317048-0507-4FF4-954C-93C788158022}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationLayerTest", "ApplicationLayerTest\ApplicationLayerTest.csproj", "{F39039E5-749A-418F-B49F-575111E68516}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +41,10 @@ Global
 		{4AA1357B-40AE-49ED-8116-C6E724B863A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AA1357B-40AE-49ED-8116-C6E724B863A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AA1357B-40AE-49ED-8116-C6E724B863A1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C9317048-0507-4FF4-954C-93C788158022}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C9317048-0507-4FF4-954C-93C788158022}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C9317048-0507-4FF4-954C-93C788158022}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C9317048-0507-4FF4-954C-93C788158022}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F39039E5-749A-418F-B49F-575111E68516}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F39039E5-749A-418F-B49F-575111E68516}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F39039E5-749A-418F-B49F-575111E68516}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F39039E5-749A-418F-B49F-575111E68516}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
