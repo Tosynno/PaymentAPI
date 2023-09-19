@@ -107,6 +107,7 @@ namespace ApplicationLayerTest
                         }
                         else
                         {
+                            if (page == 0) return response = null;
                             var metadata = new
                             {
                                 Data = new List<CustomerDto>()
