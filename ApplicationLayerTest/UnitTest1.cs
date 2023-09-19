@@ -1,4 +1,6 @@
 using Azure;
+using Azure.Core;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Moq;
 using PaymentAPI.Application.Dto;
 using PaymentAPI.Application.Interface;
@@ -14,12 +16,15 @@ namespace ApplicationLayerTest
     public class UnitTest1
     {
         public readonly ICustomerRepo _mockCustomerRepo;
+        public readonly IMarchantProfile _mockMerhcantProfile;
         ApiResponseBase<object> _response;
+        ApiResponseBase<object> _merchantResponse;
         int _selector;
         //string res;
         public UnitTest1()
         {
             Mock<ICustomerRepo> mockCustomerRepo = new Mock<ICustomerRepo>();
+            Mock<IMarchantProfile> mockMerhcantProfile = new();
             _response = new ApiResponseBase<object>();
             var metadat = new
             {
@@ -123,7 +128,80 @@ namespace ApplicationLayerTest
 
                 });
 
+            mockMerhcantProfile.Setup(setAvg => setAvg.GetAllMarchant(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(
+                (int pageIdx, int pageSize, bool previous, bool next) =>
+                {
+                    return new TaskFactory<ApiResponseBase<object>>().StartNew(() =>
+                    {
+                        ApiResponseBase<object> response = default;
+                        if (pageIdx == 2)
+                        {
+                            var metadata = new
+                            {
+                                Data = new List<CustomerDto>() {
+                            new CustomerDto() {
+                                Name = "TestDev",
+                                NationalIDNumber = "12345",
+                                Surname = "Agba Dev",
+                                CustomerNumber = "12345",
+                                DateofBirth = DateTime.UtcNow.AddYears(-26).ToString()
+                            },
+                            new CustomerDto() {
+                                Name = "TestDev1",
+                                NationalIDNumber = "123456",
+                                Surname = "Agba Dev",
+                                CustomerNumber = "123456",
+                                DateofBirth = DateTime.UtcNow.AddYears(-27).ToString()
+                            },
+                            new CustomerDto() {
+                                Name = "TestDev2",
+                                NationalIDNumber = "1234567",
+                                Surname = "Agba Dev",
+                                CustomerNumber = "1234567",
+                                DateofBirth = DateTime.UtcNow.AddYears(-28).ToString()
+                            } }
+                            };
+                            response.Data = metadata;
+                            response.ResponseCode = "01";
+                            response.ResponseDescription = "UNSUCCESSFUL";
+                        }
+                        else if (pageIdx == 1)
+                        {
+                            var metadata = new
+                            {
+                                Data = new List<CustomerDto>() {
+                            new CustomerDto() {
+                                Name = "TestDev",
+                                NationalIDNumber = "12345",
+                                Surname = "Agba Dev",
+                                CustomerNumber = "12345",
+                                DateofBirth = DateTime.UtcNow.AddYears(-26).ToString()
+                            }
+                            }
+                            };
+                            response.Data = metadata;
+                            response.ResponseCode = "01";
+                            response.ResponseDescription = "UNSUCCESSFUL";
+                        }
+                        else
+                        {
+                            if (pageIdx == 0) return response;
+                            var metadata = new
+                            {
+                                Data = new List<CustomerDto>()
+                                {
+                                }
+                            };
+                            response.Data = metadata;
+                            response.ResponseCode = "00";
+                            response.ResponseDescription = "SUCCESSFUL";
+                        }
+                        return response;
+                    });
+                });
+
             _mockCustomerRepo = mockCustomerRepo.Object;
+            _mockMerhcantProfile=mockMerhcantProfile.Object;
         }
         [Fact]
         public void GetCustomerTest()
@@ -150,6 +228,14 @@ namespace ApplicationLayerTest
             ApiResponseBase<object> allCustomer=_mockCustomerRepo.GetAllCustomer(2,1,false,false).Result;
 
             Assert.NotNull(allCustomer);
+        }
+
+        [Fact]
+        public void GetAllMerchantTest()
+        {
+            ApiResponseBase<object> allMerchant = _mockMerhcantProfile.GetAllMarchant(0, 1, false, false).Result;
+
+            Assert.Null(allMerchant);
         }
     }
 }
